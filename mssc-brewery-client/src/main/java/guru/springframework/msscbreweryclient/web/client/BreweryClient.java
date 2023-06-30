@@ -1,6 +1,7 @@
 package guru.springframework.msscbreweryclient.web.client;
 
 import guru.springframework.msscbreweryclient.web.model.BeerDto;
+import guru.springframework.msscbreweryclient.web.model.CustomerDto;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -12,6 +13,7 @@ import java.util.UUID;
 public class BreweryClient {
 
     public static final String BEER_ROOT = "/api/v1/beer";
+    public static final String CUSTOMER_ROOT = "/api/v1/customer";
     private final RestTemplate restTemplate;
     private final BreweryConfiguration configuration;
 
@@ -39,5 +41,25 @@ public class BreweryClient {
     public void deleteBeer(UUID id) {
         String url = configuration.getApiHost() + BEER_ROOT + "/" + id;
         restTemplate.delete(url);
+    }
+
+    public URI saveNewCustomer(CustomerDto customer) {
+        String uri = configuration.getApiHost() + CUSTOMER_ROOT;
+        return restTemplate.postForLocation(uri, customer);
+    }
+
+    public CustomerDto getCustomerById(UUID id) {
+        String uri = configuration.getApiHost() + CUSTOMER_ROOT + "/" + id;
+        return restTemplate.getForObject(uri, CustomerDto.class);
+    }
+
+    public void updateCustomer(UUID id, CustomerDto customer) {
+        String uri = configuration.getApiHost() + CUSTOMER_ROOT + "/" + id;
+        restTemplate.put(uri, customer);
+    }
+
+    public void deleteCustomer(UUID id) {
+        String uri = configuration.getApiHost() + CUSTOMER_ROOT + "/" + id;
+        restTemplate.delete(uri);
     }
 }
