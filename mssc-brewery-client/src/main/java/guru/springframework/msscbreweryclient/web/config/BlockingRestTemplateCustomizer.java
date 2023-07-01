@@ -16,14 +16,21 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class BlockingRestTemplateCustomizer implements RestTemplateCustomizer {
+
+    private final ClientConfiguration clientConfiguration;
+
+    public BlockingRestTemplateCustomizer(ClientConfiguration clientConfiguration) {
+        this.clientConfiguration = clientConfiguration;
+    }
+
     @Override
     public void customize(RestTemplate restTemplate) {
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(100);
-        connectionManager.setDefaultMaxPerRoute(20);
+        connectionManager.setMaxTotal(clientConfiguration.getMaxTotalConnections());
+        connectionManager.setDefaultMaxPerRoute(clientConfiguration.getMaxTotalPerRoute());
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(Timeout.of(Duration.ofMillis(3000)))
-                .setResponseTimeout(3000, TimeUnit.MILLISECONDS)
+                .setConnectionRequestTimeout(Timeout.of(Duration.ofMillis(clientConfiguration.getConnectionRequestTimeoutInMillies())))
+                .setResponseTimeout(clientConfiguration.getResponseTimeoutInMillies(), TimeUnit.MILLISECONDS)
                 .build();
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(connectionManager)
